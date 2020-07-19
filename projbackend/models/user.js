@@ -1,5 +1,7 @@
 var mongoose = require("mongoose");
 var schema = mongoose.Schema;
+const crypto = required("crypto");
+const uuidv1 = required("uuid/v1");
 
 var userSchema = new schema({
   name: {
@@ -40,9 +42,37 @@ var userSchema = new schema({
     default: [],
   },
 });
-
+userSchema
+  .virtual("password")
+  .set(function () {
+    //private variable
+    this._password = password;
+    //populate salt
+    this.salt = uuidv1();
+    this.encry_password = this.securePassword(password);
+  })
+  .get(function () {
+    //take the fields back
+    return this._password;
+  });
 userSchema.method = {
-  securePassword: function (plainpassword) {},
+  authenticate: {
+    function(plainpassword) {
+      //matching the password
+      return this.securePassword(plainpassword) === this.encry_password;
+    },
+  },
+  securePassword: function (plainpassword) {
+    if (!password) return "";
+    try {
+      return crypto
+        .createHmac("sha56", this.salt)
+        .update(plainpassword)
+        .digest("hex");
+    } catch (err) {
+      return "";
+    }
+  },
 };
 
 module.exports = mongoose.model("User", userSchema);
