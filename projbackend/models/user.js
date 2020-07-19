@@ -41,4 +41,8 @@ var userSchema = new schema({
   },
 });
 
+userSchema.method = {
+  securePassword: function (plainpassword) {},
+};
+
 module.exports = mongoose.model("User", userSchema);
