@@ -22,7 +22,10 @@ mongoose
     console.log("DB Connected");
   })
   .catch(console.log("Not connected!"));
+
+// defining the port
 const port = process.env.PORT || 8000;
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
